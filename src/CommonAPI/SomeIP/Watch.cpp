@@ -154,6 +154,10 @@ Watch::Watch(const std::shared_ptr<Connection>& _connection) :
     }
     pollFileDescriptor_.fd = pipeFileDescriptors_[0];
 #else
+
+#ifdef __ANDROID__
+#define EFD_SEMAPHORE 0
+#endif
     eventFd_ = eventfd(0, EFD_NONBLOCK | EFD_SEMAPHORE);
     if (eventFd_ == -1) {
         std::perror(__func__);

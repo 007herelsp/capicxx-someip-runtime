@@ -19,6 +19,16 @@
     #define BIG_ENDIAN 4321
 #endif
 
+
+/*Begin Add by GPu at 2018-03-02 for android support*/
+#if __ANDROID__
+#define LITTLE_ENDIAN 1234
+#define BIG_ENDIAN 4321
+
+#endif
+/*End Add by GPu at 2018-03-02 for android support*/
+
+
 namespace CommonAPI {
 namespace SomeIP {
 

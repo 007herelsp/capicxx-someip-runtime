@@ -66,10 +66,14 @@ include_directories( ${Boost_INCLUDE_DIR} )
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /wd4503")
 link_directories(${Boost_LIBRARY_DIR})
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wformat -Wformat-security -Wconversion -fexceptions -fstrict-aliasing -fstack-protector -fasynchronous-unwind-tables -fno-omit-frame-pointer -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wformat -Wformat-security -Wconversion -fexceptions -fstrict-aliasing -fstack-protector -fasynchronous-unwind-tables -fno-omit-frame-pointer -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
+
 endif()
 
-SET(MAX_LOG_LEVEL "DEBUG" CACHE STRING "maximum log level")
+message(STATUS "xxxxxxxxxxxxxxxxxxxx: ${CMAKE_CXX_FLAGS}")
+SET(MAX_LOG_LEVEL "VERBOSE" CACHE STRING "maximum log level")
 message(STATUS "MAX_LOG_LEVEL is set to value: ${MAX_LOG_LEVEL}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOMMONAPI_INTERNAL_COMPILATION")
@@ -126,7 +130,8 @@ include_directories( ${Boost_INCLUDE_DIR} )
 
 find_package (vsomeip 2.10.0 REQUIRED)
 message(STATUS "vsomeip version: ${vsomeip_VERSION}")
-
+message(STATUS "vsomeip version:  ${VSOMEIP_INCLUDE_DIRS}")
+ 
 include_directories (
     include
     ${Boost_INCLUDE_DIR}
@@ -136,6 +141,11 @@ include_directories (
 
 file (GLOB CommonAPI-SomeIP_SRC "src/CommonAPI/SomeIP/*.cpp")
 list (SORT CommonAPI-SomeIP_SRC)
+
+##去掉rpath参数
+set(CMAKE_SKIP_RPATH YES)
+
+message(STATUS "xxxxxxxxxxxxxxxxxxxxxxxxxxx:  ${CMAKE_SKIP_RPATH}")
 
 # CommonAPI
 add_library (CommonAPI-SomeIP SHARED ${CommonAPI-SomeIP_SRC})
@@ -204,6 +214,7 @@ install (
     EXPORT CommonAPI-SomeIPTargets
     DESTINATION "${INSTALL_CMAKE_DIR}"
 )
+
 
 ##############################################################################
 # create pkg-config file
