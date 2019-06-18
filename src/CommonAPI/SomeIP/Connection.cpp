@@ -175,6 +175,7 @@ void Connection::onConnectionEvent(state_type_e state) {
 void Connection::onAvailabilityChange(service_id_t _service, instance_id_t _instance,
            bool _is_available) {
     {
+        std::cout << "-----onAvailabilityChange--" << (int)_is_available << std::endl;
         std::lock_guard<std::mutex> itsLock(availabilityCalledMutex_);
         auto its_service = availabilityCalled_.find(_service);
         if (its_service != availabilityCalled_.end()) {
@@ -242,6 +243,7 @@ void Connection::cancelAsyncAnswers(const service_id_t _service, const instance_
 
 void Connection::handleAvailabilityChange(const service_id_t _service,
         instance_id_t _instance, bool _is_available) {
+        std::cout << "-----handleAvailabilityChange--" << (int)_is_available << std::endl;
     if (!_is_available) {
         // cancel sync calls
         {

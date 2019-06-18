@@ -326,7 +326,9 @@ bool Proxy::isAvailable() const {
 bool Proxy::isAvailableBlocking() const {
     std::shared_ptr<ProxyConnection> connection = getConnection();
     if (connection)
+    {
         connection->waitUntilConnected();
+    }
 
     std::unique_lock < std::mutex > itsLock(availabilityMutex_);
     while (availabilityStatus_ != AvailabilityStatus::AVAILABLE) {

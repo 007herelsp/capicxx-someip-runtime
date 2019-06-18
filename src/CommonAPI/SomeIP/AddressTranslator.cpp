@@ -83,6 +83,10 @@ AddressTranslator::translate(const CommonAPI::Address &_key, Address &_value) {
     std::lock_guard<std::mutex> itsLock(mutex_);
 #endif
     const auto it = forwards_.find(_key);
+    COMMONAPI_INFO(
+            "Use SOME/IP address data for "
+            "CommonAPI address \"", _key, "\"");
+
     if (it != forwards_.end()) {
         _value = it->second;
     } else {
@@ -114,6 +118,10 @@ AddressTranslator::translate(const Address &_key, CommonAPI::Address &_value) {
     std::lock_guard<std::mutex> itsLock(mutex_);
 #endif
     const auto it = backwards_.find(_key);
+    COMMONAPI_INFO(
+            "Using SOME/IP address data for "
+            "CommonAPI address \"", _key, "\"");
+
     if (it != backwards_.end()) {
         _value = it->second;
     } else {

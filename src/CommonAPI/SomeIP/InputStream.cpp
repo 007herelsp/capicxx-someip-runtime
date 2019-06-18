@@ -215,11 +215,17 @@ InputStream& InputStream::readValue(std::string &_value, const StringDeployment 
 
     uint32_t itsSize(0);
 
+    bool needcheckSteLen = false;
+    uint32_t fixLength = 0;
     // Read string size
     if (_depl != nullptr) {
+
         if (_depl->stringLengthWidth_ == 0) {
-            itsSize = _depl->stringLength_;
-        } else {
+            fixLength = _depl->stringLength_; //fix length string
+            needcheckSteLen = true;
+        }
+        else
+        {
             readValue(itsSize, _depl->stringLengthWidth_, false);
         }
     } else {
@@ -228,6 +234,17 @@ InputStream& InputStream::readValue(std::string &_value, const StringDeployment 
 
     if (itsSize > remaining_) {
         errorOccurred_ = true;
+    }
+
+    if(needcheckSteLen)
+    {
+        itsSize = remaining_;
+
+        if(fixLength>itsSize)
+        {
+            errorOccurred_ = true;
+            _value = "";
+        }
     }
 
     // Read string, if reading size has been successful
@@ -284,7 +301,9 @@ InputStream& InputStream::readValue(std::string &_value, const StringDeployment 
                 }
 
                 status = EncodingStatus::SUCCESS;
-            } else {
+            }
+            else
+            {
                 status = EncodingStatus::INVALID_BOM;
             }
 
@@ -295,24 +314,41 @@ InputStream& InputStream::readValue(std::string &_value, const StringDeployment 
         } else {
             if (encoder->checkBom(data, itsSize, StringEncoding::UTF8)) {
                 if (data[itsSize - 1] != 0x00) {
-                    errorOccurred_ = true;
+                    //modify by khe for "5.1.6.1.41 SOMEIP_ETS_51: echoUTF8DYNAMIC_length_too_short_for_String"
+                    //errorOccurred_ = true;
+                    data[itsSize - 1] = 0x00;
                 }
 
                 bytes = new byte_t[itsSize];
                 memcpy(bytes, (byte_t *) data, itsSize);
             }
             else
+            {
                 errorOccurred_ = true;
+            }
         }
         if (bytes == NULL) {
             _value = "";
         } else {
             // explicitly assign to support NUL (U+0000 code point) in UTF-8 strings
+        
             _value.assign(std::string((const char*)bytes, itsSize - 1u));
+
             //only delete bytes if not allocated in this function (this is the case for deployed fixed length UTF8 strings)
             if( bytes != (byte_t *) data)
                 delete[] bytes;
             bytes = NULL;
+            #if 0
+            if(needcheckSteLen)
+            {
+                if(fixLength>itsSize)
+                {
+                    printf("%s,%d,%d,%d\n", __FILE__,__LINE__,fixLength,itsSize);
+                    errorOccurred_ = true;
+                    _value = "";
+                }
+            }
+             #endif
         }
     }
 

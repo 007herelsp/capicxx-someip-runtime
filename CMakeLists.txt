@@ -13,7 +13,11 @@ set (LIBCOMMONAPI_SOMEIP_MAJOR_VERSION 3)
 set (LIBCOMMONAPI_SOMEIP_MINOR_VERSION 1)
 set (LIBCOMMONAPI_SOMEIP_PATCH_VERSION 12)
 
+
 message(STATUS "Project name: ${PROJECT_NAME}")
+
+#set is and find ok
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
 
 set (COMPONENT_VERSION ${LIBCOMMONAPI_SOMEIP_MAJOR_VERSION}.${LIBCOMMONAPI_SOMEIP_MINOR_VERSION}.${LIBCOMMONAPI_SOMEIP_PATCH_VERSION})
 set (COMMONAPI_API_HEADER_VERSION ${LIBCOMMONAPI_SOMEIP_MAJOR_VERSION}.${LIBCOMMONAPI_SOMEIP_MINOR_VERSION})
@@ -48,28 +52,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if (MSVC) 
-# Boost
-find_package( Boost 1.54 COMPONENTS system thread log REQUIRED )
-if(Boost_FOUND)
-  if(Boost_LIBRARY_DIR)
-    MESSAGE( STATUS "Boost_LIBRARY_DIR not empty using it: ${Boost_LIBRARY_DIR}" )
-  else()
-    if(BOOST_LIBRARYDIR)
-      MESSAGE( STATUS "Boost_LIBRARY_DIR empty but BOOST_LIBRARYDIR is set setting Boost_LIBRARY_DIR to: ${BOOST_LIBRARYDIR}" )
-      set(Boost_LIBRARY_DIR ${BOOST_LIBRARYDIR})
-    endif()
-  endif()
-else()
-  MESSAGE( STATUS "Boost was not found!")
-endif()
-include_directories( ${Boost_INCLUDE_DIR} )
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /wd4503")
-link_directories(${Boost_LIBRARY_DIR})
-else()
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wformat -Wformat-security -Wconversion -fexceptions -fstrict-aliasing -fstack-protector -fasynchronous-unwind-tables -fno-omit-frame-pointer -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
-
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
 endif()
 
 message(STATUS "xxxxxxxxxxxxxxxxxxxx: ${CMAKE_CXX_FLAGS}")
@@ -113,28 +98,31 @@ foreach (p LIB BIN INCLUDE CMAKE)
 endforeach ()
 
 ###################################################################################################
+find_package (vsomeip 2.10.21 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
+message(STATUS "vsomeip version: ${vsomeip_VERSION}")
+message(STATUS "vsomeip version:  ${VSOMEIP_INCLUDE_DIRS}")
 
 if ("${USE_INSTALLED_COMMONAPI}" STREQUAL "ON")
-    FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
+     FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
 else()
-    FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+     FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH )    
 endif()
+#message(STATUS "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa${CommonAPI_DIR}")
 
 message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
 message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
 message(STATUS "CommonAPI Version: ${CommonAPI_VERSION}")
 
-# Boost
-find_package( Boost 1.54 COMPONENTS system thread log REQUIRED )
-include_directories( ${Boost_INCLUDE_DIR} )
+if (${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    set(OS "Android")
 
-find_package (vsomeip 2.10.0 REQUIRED)
-message(STATUS "vsomeip version: ${vsomeip_VERSION}")
-message(STATUS "vsomeip version:  ${VSOMEIP_INCLUDE_DIRS}")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
+
+
+
  
 include_directories (
     include
-    ${Boost_INCLUDE_DIR}
     ${COMMONAPI_INCLUDE_DIRS}
     ${VSOMEIP_INCLUDE_DIRS}
 )
@@ -149,8 +137,8 @@ message(STATUS "xxxxxxxxxxxxxxxxxxxxxxxxxxx:  ${CMAKE_SKIP_RPATH}")
 
 # CommonAPI
 add_library (CommonAPI-SomeIP SHARED ${CommonAPI-SomeIP_SRC})
-set_target_properties (CommonAPI-SomeIP PROPERTIES VERSION ${COMPONENT_VERSION} SOVERSION ${COMPONENT_VERSION})
-target_link_libraries (CommonAPI-SomeIP CommonAPI vsomeip)
+set_target_properties (CommonAPI-SomeIP PROPERTIES VERSION ${COMPONENT_VERSION} SOVERSION ${COMPONENT_VERSION}  )
+target_link_libraries (CommonAPI-SomeIP ${USE_RT} CommonAPI vsomeip)
 
 if (MSVC)
     target_link_libraries(CommonAPI-SomeIP ws2_32 Rpcrt4)

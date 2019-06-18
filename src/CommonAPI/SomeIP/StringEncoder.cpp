@@ -45,6 +45,7 @@ bool StringEncoder::checkBom(byte_t *&_data, uint32_t &_size, StringEncoding _en
 
     return result;
 }
+
 void StringEncoder::utf16To8(const byte_t *_utf16Str, int _endianess, size_t _size, EncodingStatus &_status, byte_t **_result, size_t &_length)
 {
     _status = EncodingStatus::SUCCESS;
@@ -60,7 +61,9 @@ void StringEncoder::utf16To8(const byte_t *_utf16Str, int _endianess, size_t _si
             _length = 0;
             return;
         }
+
         uint32_t secondByte = *_utf16Str & 0xff;
+
         uint32_t codePoint = 0;
         if (_endianess == BIG_ENDIAN)
             codePoint = firstByte << 8 | secondByte;

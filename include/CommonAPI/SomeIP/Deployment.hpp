@@ -18,6 +18,11 @@
 namespace CommonAPI {
 namespace SomeIP {
 
+
+//add for rawdata
+struct RawDeployment {};
+
+
 template<typename Type_>
 struct IntegerDeployment : CommonAPI::Deployment<>  {
     IntegerDeployment(uint8_t _bits)

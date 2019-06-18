@@ -467,6 +467,18 @@ private:
             }
         );
 
+			if(0 != client->ErrorCode)
+			{
+				 
+			        return_code_e code=	return_code_e(client->ErrorCode);
+					
+					auto error = _message.createErrorResponseMessage(code);
+
+				//auto error = _message.createErrorResponseMessage(return_code_e::E_MALFORMED_MESSAGE);
+					 _connection->sendMessage(error);
+			}
+		 
+
         return true;
     }
 

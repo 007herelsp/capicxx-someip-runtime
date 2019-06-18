@@ -226,13 +226,25 @@ OutputStream& OutputStream::writeValue(const std::string &_value, const StringDe
         bomSize = 3;
         terminationSize = 1;
     }
-
+   
     //write string length
     if (_depl != nullptr) {
+        uint32_t stringlength = _value.length();
+        printf("---------%d %d %d %d %d---------------\r\n",
+            _depl->stringLengthWidth_,
+            _depl->stringLength_,
+            
+            stringlength,
+            terminationSize,
+            bomSize);
         if (_depl->stringLengthWidth_ == 0
-                && _depl->stringLength_  != size + terminationSize + bomSize ) {
+                && _depl->stringLength_  != stringlength + terminationSize + bomSize ) {
                 errorOccurred = true;
-        } else {
+
+        }
+        else 
+        {
+
             _writeValue(uint32_t(size + terminationSize + bomSize),
                     _depl->stringLengthWidth_);
         }
