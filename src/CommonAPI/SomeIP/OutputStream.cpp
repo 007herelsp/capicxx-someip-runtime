@@ -230,16 +230,21 @@ OutputStream& OutputStream::writeValue(const std::string &_value, const StringDe
     //write string length
     if (_depl != nullptr) {
         uint32_t stringlength = _value.length();
-        printf("---------%d %d %d %d %d---------------\r\n",
+        COMMONAPI_INFO( "OutputStream::writeValue(const std::string &_value, const StringDeployment *_depl)",
+        "stringLengthWidth_:",
             _depl->stringLengthWidth_,
+            ",stringLength_:",
             _depl->stringLength_,
-            
+            ",stringlength:",
             stringlength,
+            ",terminationSize:",
             terminationSize,
+            ",bomSize:",
             bomSize);
         if (_depl->stringLengthWidth_ == 0
                 && _depl->stringLength_  != stringlength + terminationSize + bomSize ) {
                 errorOccurred = true;
+				COMMONAPI_INFO("_depl->stringLengthWidth_ == 0 && _depl->stringLength_  != stringlength + terminationSize + bomSize");
 
         }
         else 
@@ -252,7 +257,6 @@ OutputStream& OutputStream::writeValue(const std::string &_value, const StringDe
         _writeValue(uint32_t(size + terminationSize + bomSize), 4);
     }
 
-
     if(!errorOccurred) {
         // Write BOM
         _writeBom(_depl);
@@ -264,7 +268,7 @@ OutputStream& OutputStream::writeValue(const std::string &_value, const StringDe
         const byte_t termination[] = { 0x00, 0x00 };
         _writeRaw(termination, terminationSize);
     } else {
-        COMMONAPI_ERROR("OutputStream::writeValue(string): error occurred");
+        COMMONAPI_ERROR("OutputStream::writeValue(string): error occurred:",errorOccurred );
     }
 
     if (bytes != reinterpret_cast<byte_t *>(const_cast<char *>(_value.c_str()))) {

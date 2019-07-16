@@ -52,12 +52,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if (MSVC) 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCOMMONAPI_INTERNAL_COMPILATION -D_GLIBCXX_USE_NANOSLEEP -DBOOST_LOG_DYN_LINK -pthread")
 endif()
 
-message(STATUS "xxxxxxxxxxxxxxxxxxxx: ${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 SET(MAX_LOG_LEVEL "VERBOSE" CACHE STRING "maximum log level")
 message(STATUS "MAX_LOG_LEVEL is set to value: ${MAX_LOG_LEVEL}")
 
@@ -98,27 +99,20 @@ foreach (p LIB BIN INCLUDE CMAKE)
 endforeach ()
 
 ###################################################################################################
-find_package (vsomeip 2.10.21 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
-message(STATUS "vsomeip version: ${vsomeip_VERSION}")
-message(STATUS "vsomeip version:  ${VSOMEIP_INCLUDE_DIRS}")
-
-if ("${USE_INSTALLED_COMMONAPI}" STREQUAL "ON")
-     FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
-else()
-     FIND_PACKAGE(CommonAPI 3.1.12 REQUIRED CONFIG  NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH )    
-endif()
-#message(STATUS "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa${CommonAPI_DIR}")
-
+ 
 message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
 message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
 message(STATUS "CommonAPI Version: ${CommonAPI_VERSION}")
-
+message(STATUS "VSOMEIP_INCLUDE_DIRS: ${VSOMEIP_INCLUDE_DIRS}")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Android")
     set(OS "Android")
 
 endif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
 
-
+link_directories(
+    ${COMMONAPI_LIB_DIRS}
+	${VSOMEIP_LIB_DIRS}
+	)
 
  
 include_directories (
