@@ -100,6 +100,7 @@ endforeach ()
 
 ###################################################################################################
  
+ 
 message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
 message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
 message(STATUS "CommonAPI Version: ${CommonAPI_VERSION}")
@@ -117,6 +118,8 @@ link_directories(
  
 include_directories (
     include
+     ${vsomeip_INCLUDE} 
+     ${CommonAPI_INCLUDE_INSTALL_FILES}
     ${COMMONAPI_INCLUDE_DIRS}
     ${VSOMEIP_INCLUDE_DIRS}
 )
@@ -207,4 +210,4 @@ endif()
 
 ##############################################################################
 # maintainer-clean
-add_custom_target(maintainer-clean COMMAND rm -rf *)
+#add_custom_target(maintainer-clean COMMAND rm -rf *)
